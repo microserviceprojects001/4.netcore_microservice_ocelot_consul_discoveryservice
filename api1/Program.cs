@@ -7,6 +7,8 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.Configure<ConsulConfig>(builder.Configuration.GetSection("Consul"));
+
 // 添加 Consul 客户端
 builder.Services.AddSingleton<IConsulClient>(sp =>
     new ConsulClient(config =>
@@ -33,5 +35,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/HealthCheck");
 
 app.Run();

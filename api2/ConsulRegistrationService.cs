@@ -10,7 +10,7 @@ public class ConsulRegistrationService : IHostedService
     private string _serviceId;
 
     public ConsulRegistrationService(
-        IConsulClient consulClient, 
+        IConsulClient consulClient,
         IOptions<ConsulConfig> consulConfig,
         ILogger<ConsulRegistrationService> logger)
     {
@@ -22,7 +22,13 @@ public class ConsulRegistrationService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _serviceId = $"{_consulConfig.ServiceName}-{Guid.NewGuid()}";
-        
+
+        var healthCheck = $"{_consulConfig.ServiceScheme}://{_consulConfig.ServiceAddress}:{_consulConfig.ServicePort}/HealthCheck";
+
+        var serviceName = _consulConfig.ServiceName;
+
+        Console.WriteLine($"Registering service {serviceName} with ID {_serviceId} at {healthCheck}");
+
         var registration = new AgentServiceRegistration
         {
             ID = _serviceId,
@@ -31,10 +37,11 @@ public class ConsulRegistrationService : IHostedService
             Port = _consulConfig.ServicePort,
             Check = new AgentServiceCheck
             {
-                HTTP = $"{_consulConfig.ServiceScheme}://{_consulConfig.ServiceAddress}:{_consulConfig.ServicePort}/health",
+                HTTP = $"{_consulConfig.ServiceScheme}://{_consulConfig.ServiceAddress}:{_consulConfig.ServicePort}/HealthCheck",
                 Interval = TimeSpan.FromSeconds(10),
                 Timeout = TimeSpan.FromSeconds(5),
-                DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(30)
+                DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(30),
+                TLSSkipVerify = true, // 跳过证书验证
             }
         };
 
