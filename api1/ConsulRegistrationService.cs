@@ -41,7 +41,7 @@ public class ConsulRegistrationService : IHostedService
                 Interval = TimeSpan.FromSeconds(10),
                 Timeout = TimeSpan.FromSeconds(5),
                 DeregisterCriticalServiceAfter = TimeSpan.FromSeconds(30),
-                TLSSkipVerify = true, // 跳过证书验证
+                //TLSSkipVerify = true, // 跳过证书验证
             }
         };
 
